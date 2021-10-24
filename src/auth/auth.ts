@@ -1,6 +1,6 @@
 import passport from "passport";
 import { Strategy } from "passport-local";
-import { userModel } from "../components/user";
+import { User } from "../components/user";
 import { Strategy as JWTStrategy, ExtractJwt } from "passport-jwt";
 
 const localStrategy = Strategy;
@@ -14,7 +14,7 @@ const signUpStrategy = passport.use(
     },
     async (email, password, done) => {
       try {
-        const user = await userModel.create({ email, password });
+        const user = await User.create({ email, password });
 
         return done(null, user);
       } catch (error) {
@@ -33,7 +33,7 @@ const loginStrategy = passport.use(
     },
     async (email, password, done) => {
       try {
-        const user = await userModel.findOne({ email });
+        const user = await User.findOne({ email });
 
         if (!user) {
           return done(null, false, { message: "User not found" });

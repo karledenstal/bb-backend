@@ -2,9 +2,24 @@ import { Schema, model } from "mongoose";
 import argon2 from "argon2";
 import URLSlugs from "mongoose-url-slugs";
 
-const User = new Schema(
+interface IUser {
+  email: string;
+  password: string;
+  alias: string;
+  slug: string;
+  updatedAt?: string;
+  createdAt?: string;
+  isValidPassword(password: string): boolean;
+}
+
+const User = new Schema<IUser>(
   {
     email: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    alias: {
       type: String,
       required: true,
       unique: true,
@@ -15,29 +30,30 @@ const User = new Schema(
     },
     slug: {
       type: String,
-      default: '',
+      default: "",
       unique: true,
-    }
+    },
   },
   {
     timestamps: true,
   }
 );
 
-User.pre("save", async (next) => {
-  const user: any = this;
-  const hash = await argon2.hash(user.password);
-  user.password = hash;
+User.pre("save", async function (next): Promise<void> {
+  const self: any = this;
+  console.log("self", self);
+  const hash = await argon2.hash(self.password);
+  self.password = hash;
   next();
 });
 
-User.methods.isValidPassword = async (password) => {
+User.methods.isValidPassword = async function (password): Promise<boolean> {
   const user: any = this;
   const valid = await argon2.verify(user.password, password);
 
   return valid;
-}
+};
 
-User.plugin(URLSlugs('username', { field: 'slug' }));
+User.plugin(URLSlugs("alias", { field: "slug" }));
 
-export default model("user", User);
+export default model<IUser>("user", User);
