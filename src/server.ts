@@ -2,11 +2,13 @@ import express from "express";
 import { config as dotenvConfig } from "dotenv-safe";
 import morgan from "morgan";
 import cors from "cors";
-import { json as bodyParserJson} from "body-parser";
+import { json as bodyParserJson } from "body-parser";
 import dbConnect from "./config/db";
 
 async function main() {
-  dotenvConfig();
+  dotenvConfig({
+    allowEmptyValues: true,
+  });
   const app = express();
   const port = process.env.PORT || 8080;
 
@@ -21,4 +23,4 @@ async function main() {
   });
 }
 
-main().catch((e) => console.error('init error', e));
+main().catch((e) => console.error("init error", e));
